@@ -10,7 +10,7 @@
 
 # misc
 /.sass-cache
-/.DS_Store
+*.DS_Store
 /connect.lock
 /coverage/*
 /libpeerconnection.log

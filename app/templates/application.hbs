@@ -1,0 +1,12 @@
+<h2 id="title">Welcome to Mura with Ember.js</h2>
+<ul>
+   <li><a {{bind-attr href=home.urlhash}}>{{home.menutitle}}</a></li>
+   {{#if home.kids.length}}
+   {{#each kid in home.kids}}
+   <li><a {{bind-attr href=kid.urlhash}}>{{kid.menutitle}}</a></li>
+   {{/each}}
+   {{/if}}
+   <li><a href="#/customapp">Custom App</a></li>
+ </ul>
+
+{{outlet}}

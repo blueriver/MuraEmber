@@ -20,6 +20,7 @@ module.exports = function(environment) {
       nocache:0,
       apiEndpoint:"http://localhost/index.cfm/_api/ajax/v1/",
       assetpath:"http://localhost/default",
+      requirementspath:"http://localhost/requirements",
       themepath:"http://localhost/default/includes/themes/MuraBootstrap3",
       rb:"en",
       reCAPTCHALanguage:"",

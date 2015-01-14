@@ -435,6 +435,14 @@ var initMura=function(config){
 
 	!window.jQuery && document.write(unescape('%3Cscript type="text/javascript" src="' + config.assetpath + '/jquery/jquery.js"%3E%3C/script%3E'))
 
+	if(!config.apiEndpoint){
+		config.apiEndpoint=config.context + '/index.cfm/_api/ajax/v1/';
+	}
+
+	if(!config.requirementspath){
+		config.requirementspath=config.context + '/requirements';
+	}
+
 	var createCookie=function(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -479,8 +487,8 @@ var initMura=function(config){
 
 	var setHTMLEditor=function(el) {
 		loader().loadjs(
-			config.context + '/requirements/ckeditor/ckeditor.js',
-			config.context + '/requirements/ckeditor/adapters/jquery.js'
+			config.requirementspath + '/ckeditor/ckeditor.js',
+			config.requirementspath + '/ckeditor/adapters/jquery.js'
 			,
 			function(){
 				initEditor();
@@ -1006,10 +1014,6 @@ var initMura=function(config){
 
 	var loader=function(){return window.ljs;}
 
-	if(!config.apiEndpoint){
-		config.apiEndpoint=config.context + '/index.cfm/_api/ajax/v1/';
-	}
-
 	var processHandlers=function(scope){
 		var handlers=[
 			function(){
@@ -1026,7 +1030,7 @@ var initMura=function(config){
 
 			function(){
 				if($(scope).find( ".cffp_mm" ).length){
-					loader().loadjs(config.context + '/requirements/cfformprotect/js/cffp.js');
+					loader().loadjs(config.requirementspath + '/cfformprotect/js/cffp.js');
 				}
 			},
 

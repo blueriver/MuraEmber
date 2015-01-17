@@ -435,6 +435,14 @@ var initMura=function(config){
 
 	!window.jQuery && document.write(unescape('%3Cscript type="text/javascript" src="' + config.assetpath + '/jquery/jquery.js"%3E%3C/script%3E'))
 
+	if(!config.context){
+		config.context='';
+	}
+
+	if(!config.assetpath){
+		config.assetpath=config.context;
+	}
+
 	if(!config.apiEndpoint){
 		config.apiEndpoint=config.context + '/index.cfm/_api/ajax/v1/';
 	}
@@ -442,6 +450,19 @@ var initMura=function(config){
 	if(!config.requirementspath){
 		config.requirementspath=config.context + '/requirements';
 	}
+
+	if(typeof config.adminpreview == 'undefined'){
+		config.adminpreview=false;
+	}
+
+	if(typeof config.mobileformat == 'undefined'){
+		config.mobileformat=false;
+	}
+
+	if(typeof config.windowdocumentdomain != 'undefined' && config.windowdocumentdomain != ''){
+		window.document.domain=config.windowdocumentdomain;
+	}
+	
 
 	var createCookie=function(name,value,days) {
 		if (days) {
@@ -709,16 +730,18 @@ var initMura=function(config){
 
 	var initShadowBox=function(el){
 
-		if($(el).find( '[data-rel^="shadowbox"]').length){
+		if($(el).find('[data-rel^="shadowbox"],[rel^="shadowbox"]').length){
 			loader().load(
 				config.assetpath +'/css/shadowbox.min.css',
 				config.assetpath +'/js/adapter/shadowbox-jquery.min.js',
 				config.assetpath +'/js/shadowbox.min.js',
 					function(){
+						found=true;
 						window.Shadowbox.init();
 					}
 				);
-		}
+		} 
+			
 	}
 
 	var validateForm=function(frm,customaction) {
@@ -1030,13 +1053,15 @@ var initMura=function(config){
 
 			function(){
 				if($(scope).find( ".cffp_mm" ).length){
-					loader().loadjs(config.requirementspath + '/cfformprotect/js/cffp.js');
+					$.getScript(config.requirementspath + '/cfformprotect/js/cffp.js');
+					//loader().loadjs(config.requirementspath + '/cfformprotect/js/cffp.js');
 				}
 			},
 
 			function(){
 				if($(scope).find( ".g-recaptcha" ).length){
-					loader().loadjs('https://www.google.com/recaptcha/api.js?hl=' + config.reCAPTCHALanguage);
+					$.getScript('https://www.google.com/recaptcha/api.js?hl=' + config.reCAPTCHALanguage);				
+					//loader().loadjs('https://www.google.com/recaptcha/api.js?hl=' + config.reCAPTCHALanguage);
 				}
 			},
 
@@ -1063,9 +1088,20 @@ var initMura=function(config){
 
 			function(){
 				initShadowBox(scope);
+			},
+
+			function(){
+				if(config.adminpreview=='yes' || config.adminpreview=='true'){
+					$("a").attr('href', function(i, h) {
+						if(h.indexOf('muraadminpreview')==-1){
+							return h + (h.indexOf('?') != -1 ? "&muraadminpreview&mobileformat=" + config.mobileformat : "?muraadminpreview&muraadminpreview&mobileformat=" + config.mobileformat);
+						} else {
+							return f;
+						}
+					});
+				}
 			}
 		];
-
 
 		for(var h=0;h<handlers.length;h++){
 			handlers[h]();
@@ -1121,7 +1157,7 @@ var initMura=function(config){
 						} 
 			
 			} else {
-				var data=$.extend(true,{siteid:config.siteid,contentid:config.contentid,contenthistid:config.contenthistid,nocache:1},setLowerCaseKeys($( frm ).serializeObject()),setLowerCaseKeys($(self).data()));
+				var data=$.extend(true,setLowerCaseKeys($( frm ).serializeObject()),{siteid:config.siteid,contentid:config.contentid,contenthistid:config.contenthistid,nocache:1},setLowerCaseKeys($(self).data()));
 
 				if(!('g-recaptcha-response' in data) && $("#g-recaptcha-response").length){
 					data['g-recaptcha-response']=$("#g-recaptcha-response").val();
@@ -1152,20 +1188,17 @@ var initMura=function(config){
 
 		var data=$.extend(true,{siteid:config.siteid,contentid:config.contentid,contenthistid:config.contenthistid,nocache:config.nocache},$(self).data());
 		
-		//data=$(data).clone();
-
 		if('objectparams' in data){
 			data['objectparams']= escape(JSON.stringify(data['objectparams']));
 		}
 
 		$(self).html(config.preloaderMarkup);
 
-
 		$.ajax({
 				url:  config.apiEndpoint + '?method=processAsyncObject',
 				type: 'GET',
 				data: data,
-				dataType: 'JSON',
+				dataType: 'JSON'
 		}).then(handleResponse);
 	}
 
@@ -1184,9 +1217,8 @@ var initMura=function(config){
 		createCookie:createCookie
 	});
 
+	
 	$(function(){
-		
-
 		processHandlers(document);
 
 		$(document).on('keydown',function(event){
@@ -1218,12 +1250,13 @@ var initMura=function(config){
 
 			return el;
 		};
-		$(document).trigger('muraReady');
 
+
+		$(document).trigger('muraReady');
 	});
 
 };
 
- initMura(config.APP);
+initMura(config.APP);
 
 export default mura;

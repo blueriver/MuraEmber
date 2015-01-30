@@ -136,11 +136,15 @@ export default DS.Adapter.extend({
         
         data=data.data;
 
-        if(typeof data === 'object' && 'items' in data){
-          data=data.items;
-        }
+        if(typeof data === 'object' && 'redirect' in data){
+          location.href=resp.data.redirect;
+        } else {
+          if(typeof data === 'object' && 'items' in data){
+            data=data.items;
+          }
 
-        Ember.run(null, resolve, data);
+          Ember.run(null, resolve, data);
+        }
       }, function(jqXHR) {
         jqXHR.then = null; // tame jQuery's ill mannered promises
         Ember.run(null, reject, jqXHR);
